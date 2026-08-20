@@ -1,0 +1,2805 @@
+{
+  "manifest_schema_version": 3,
+  "sdk_version": "5.9.22",
+  "app_id": "blue-prism-connector",
+  "version": "0.1.0",
+  "name": "Blue Prism",
+  "description": "Connect your own Blue Prism estate (via Blue Prism Hub + Authentication Server v4.7+) to see and manage your processes, sessions, work queues, and runtime resources from Imperal -- list processes and start/stop sessions against them, manage work queue items, browse connected runtime resources, and read credential metadata. Uses your own Authentication Server Service Account (OAuth2 client credentials) -- nothing is hosted or proxied by Imperal beyond the request itself. Requires Blue Prism Hub + Authentication Server v4.7+; classic Blue Prism Server without Hub has no REST surface this connector can reach.",
+  "icon": "",
+  "actions_explicit": true,
+  "system": false,
+  "capabilities": [],
+  "tools": [
+    {
+      "name": "connect_blue_prism",
+      "description": "Connect your Blue Prism estate (via Blue Prism Hub + Authentication Server v4.7+) by saving your Service Account's client_id/client_secret plus the Authentication Server URL and Hub/API base URL, after checking the credentials actually work. Requires Blue Prism Hub + Authentication Server v4.7+ -- classic Blue Prism Server without Hub has no REST surface this connector can reach.",
+      "action_type": "write",
+      "chain_callable": true,
+      "effects": [
+        "blue_prism.provider.connected"
+      ],
+      "id_projection": "",
+      "params_schema": {
+        "properties": {
+          "auth_server_url": {
+            "default": "",
+            "description": "Your Blue Prism Authentication Server URL, e.g. https://yourhub.example.com/authserver",
+            "title": "Auth Server Url",
+            "type": "string"
+          },
+          "api_base_url": {
+            "default": "",
+            "description": "Your Blue Prism Hub/API base URL, e.g. https://yourhub.example.com/api",
+            "title": "Api Base Url",
+            "type": "string"
+          },
+          "client_id": {
+            "default": "",
+            "description": "Authentication Server Service Account client ID.",
+            "title": "Client Id",
+            "type": "string"
+          },
+          "client_secret": {
+            "default": "",
+            "description": "Authentication Server Service Account client secret.",
+            "title": "Client Secret",
+            "type": "string"
+          },
+          "label": {
+            "default": "",
+            "description": "Optional friendly name for this Blue Prism estate connection.",
+            "title": "Label",
+            "type": "string"
+          }
+        },
+        "title": "ConnectBluePrismParams",
+        "type": "object"
+      },
+      "return_schema": {
+        "properties": {
+          "id": {
+            "default": "",
+            "title": "Id",
+            "type": "string"
+          },
+          "title": {
+            "default": "",
+            "title": "Title",
+            "type": "string"
+          },
+          "kind": {
+            "default": "",
+            "title": "Kind",
+            "type": "string"
+          },
+          "subtitle": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Subtitle"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Description"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Status"
+          },
+          "url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Url"
+          },
+          "connected": {
+            "default": false,
+            "title": "Connected",
+            "type": "boolean"
+          },
+          "detail": {
+            "default": "",
+            "title": "Detail",
+            "type": "string"
+          },
+          "api_base_url": {
+            "default": "",
+            "title": "Api Base Url",
+            "type": "string"
+          }
+        },
+        "title": "ProviderConnection",
+        "type": "object",
+        "x-sdl": "entity"
+      },
+      "event": "blue-prism-connector.connect_blue_prism",
+      "background": false,
+      "long_running": false,
+      "scopes": [],
+      "owner_chat_tool": "blue_prism"
+    },
+    {
+      "name": "list_connections",
+      "description": "List the connected Blue Prism estates.",
+      "action_type": "read",
+      "chain_callable": true,
+      "effects": [],
+      "id_projection": "",
+      "params_schema": {
+        "description": "Explicit empty params model -- V17 disallows untyped handlers.",
+        "properties": {},
+        "title": "NoParams",
+        "type": "object"
+      },
+      "return_schema": {
+        "$defs": {
+          "ProviderConnection": {
+            "properties": {
+              "id": {
+                "default": "",
+                "title": "Id",
+                "type": "string"
+              },
+              "title": {
+                "default": "",
+                "title": "Title",
+                "type": "string"
+              },
+              "kind": {
+                "default": "",
+                "title": "Kind",
+                "type": "string"
+              },
+              "subtitle": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Subtitle"
+              },
+              "description": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Description"
+              },
+              "status": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Status"
+              },
+              "url": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Url"
+              },
+              "connected": {
+                "default": false,
+                "title": "Connected",
+                "type": "boolean"
+              },
+              "detail": {
+                "default": "",
+                "title": "Detail",
+                "type": "string"
+              },
+              "api_base_url": {
+                "default": "",
+                "title": "Api Base Url",
+                "type": "string"
+              }
+            },
+            "title": "ProviderConnection",
+            "type": "object",
+            "x-sdl": "entity"
+          }
+        },
+        "properties": {
+          "id": {
+            "default": "provider_connection_list",
+            "title": "Id",
+            "type": "string"
+          },
+          "title": {
+            "default": "",
+            "title": "Title",
+            "type": "string"
+          },
+          "kind": {
+            "default": "",
+            "title": "Kind",
+            "type": "string"
+          },
+          "subtitle": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Subtitle"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Description"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Status"
+          },
+          "url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Url"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/$defs/ProviderConnection"
+            },
+            "title": "Items",
+            "type": "array"
+          }
+        },
+        "title": "ProviderConnectionList",
+        "type": "object",
+        "x-sdl": "entity"
+      },
+      "event": "blue-prism-connector.list_connections",
+      "background": false,
+      "long_running": false,
+      "scopes": [],
+      "owner_chat_tool": "blue_prism"
+    },
+    {
+      "name": "disconnect_blue_prism",
+      "description": "Disconnect one Blue Prism estate. Nothing in Blue Prism itself is changed; only the saved credentials here are deleted.",
+      "action_type": "write",
+      "chain_callable": true,
+      "effects": [
+        "blue_prism.provider.disconnected"
+      ],
+      "id_projection": "",
+      "params_schema": {
+        "properties": {
+          "connection_id": {
+            "description": "Connection id to disconnect, from list_connections.",
+            "title": "Connection Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "connection_id"
+        ],
+        "title": "DisconnectBluePrismParams",
+        "type": "object"
+      },
+      "return_schema": {
+        "properties": {
+          "id": {
+            "default": "",
+            "title": "Id",
+            "type": "string"
+          },
+          "title": {
+            "default": "",
+            "title": "Title",
+            "type": "string"
+          },
+          "kind": {
+            "default": "",
+            "title": "Kind",
+            "type": "string"
+          },
+          "subtitle": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Subtitle"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Description"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Status"
+          },
+          "url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Url"
+          },
+          "ok": {
+            "default": false,
+            "title": "Ok",
+            "type": "boolean"
+          }
+        },
+        "title": "DeleteResult",
+        "type": "object",
+        "x-sdl": "entity"
+      },
+      "event": "blue-prism-connector.disconnect_blue_prism",
+      "background": false,
+      "long_running": false,
+      "scopes": [],
+      "owner_chat_tool": "blue_prism"
+    },
+    {
+      "name": "list_processes",
+      "description": "List processes available in the connected Blue Prism estate.",
+      "action_type": "read",
+      "chain_callable": true,
+      "effects": [],
+      "id_projection": "",
+      "params_schema": {
+        "properties": {
+          "connection_id": {
+            "default": "",
+            "description": "Which connected estate to use. Omit if only one is connected.",
+            "title": "Connection Id",
+            "type": "string"
+          }
+        },
+        "title": "ListProcessesParams",
+        "type": "object"
+      },
+      "return_schema": {
+        "$defs": {
+          "Process": {
+            "properties": {
+              "id": {
+                "default": "",
+                "title": "Id",
+                "type": "string"
+              },
+              "title": {
+                "default": "",
+                "title": "Title",
+                "type": "string"
+              },
+              "kind": {
+                "default": "",
+                "title": "Kind",
+                "type": "string"
+              },
+              "subtitle": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Subtitle"
+              },
+              "description": {
+                "default": "",
+                "title": "Description",
+                "type": "string"
+              },
+              "status": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Status"
+              },
+              "url": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Url"
+              },
+              "is_published": {
+                "default": false,
+                "title": "Is Published",
+                "type": "boolean"
+              }
+            },
+            "title": "Process",
+            "type": "object",
+            "x-sdl": "entity"
+          }
+        },
+        "properties": {
+          "id": {
+            "default": "process_list",
+            "title": "Id",
+            "type": "string"
+          },
+          "title": {
+            "default": "",
+            "title": "Title",
+            "type": "string"
+          },
+          "kind": {
+            "default": "",
+            "title": "Kind",
+            "type": "string"
+          },
+          "subtitle": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Subtitle"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Description"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Status"
+          },
+          "url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Url"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/$defs/Process"
+            },
+            "title": "Items",
+            "type": "array"
+          }
+        },
+        "title": "ProcessList",
+        "type": "object",
+        "x-sdl": "entity"
+      },
+      "event": "blue-prism-connector.list_processes",
+      "background": false,
+      "long_running": false,
+      "scopes": [],
+      "owner_chat_tool": "blue_prism"
+    },
+    {
+      "name": "get_process",
+      "description": "Read one Blue Prism process in full.",
+      "action_type": "read",
+      "chain_callable": true,
+      "effects": [],
+      "id_projection": "",
+      "params_schema": {
+        "properties": {
+          "connection_id": {
+            "default": "",
+            "description": "Which connected estate to use. Omit if only one is connected.",
+            "title": "Connection Id",
+            "type": "string"
+          },
+          "process_id": {
+            "description": "Process id, from list_processes.",
+            "title": "Process Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "process_id"
+        ],
+        "title": "GetProcessParams",
+        "type": "object"
+      },
+      "return_schema": {
+        "properties": {
+          "id": {
+            "default": "",
+            "title": "Id",
+            "type": "string"
+          },
+          "title": {
+            "default": "",
+            "title": "Title",
+            "type": "string"
+          },
+          "kind": {
+            "default": "",
+            "title": "Kind",
+            "type": "string"
+          },
+          "subtitle": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Subtitle"
+          },
+          "description": {
+            "default": "",
+            "title": "Description",
+            "type": "string"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Status"
+          },
+          "url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Url"
+          },
+          "is_published": {
+            "default": false,
+            "title": "Is Published",
+            "type": "boolean"
+          }
+        },
+        "title": "Process",
+        "type": "object",
+        "x-sdl": "entity"
+      },
+      "event": "blue-prism-connector.get_process",
+      "background": false,
+      "long_running": false,
+      "scopes": [],
+      "owner_chat_tool": "blue_prism"
+    },
+    {
+      "name": "list_sessions",
+      "description": "List recent sessions (process runs) in the connected Blue Prism estate, most recent first, optionally filtered by process.",
+      "action_type": "read",
+      "chain_callable": true,
+      "effects": [],
+      "id_projection": "",
+      "params_schema": {
+        "properties": {
+          "connection_id": {
+            "default": "",
+            "description": "Which connected estate to use. Omit if only one is connected.",
+            "title": "Connection Id",
+            "type": "string"
+          },
+          "process_id": {
+            "default": "",
+            "description": "Optional process id to filter sessions to.",
+            "title": "Process Id",
+            "type": "string"
+          }
+        },
+        "title": "ListSessionsParams",
+        "type": "object"
+      },
+      "return_schema": {
+        "$defs": {
+          "Session": {
+            "properties": {
+              "id": {
+                "default": "",
+                "title": "Id",
+                "type": "string"
+              },
+              "title": {
+                "default": "",
+                "title": "Title",
+                "type": "string"
+              },
+              "kind": {
+                "default": "",
+                "title": "Kind",
+                "type": "string"
+              },
+              "subtitle": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Subtitle"
+              },
+              "description": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Description"
+              },
+              "status": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Status"
+              },
+              "url": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Url"
+              },
+              "process_name": {
+                "default": "",
+                "title": "Process Name",
+                "type": "string"
+              },
+              "resource_name": {
+                "default": "",
+                "title": "Resource Name",
+                "type": "string"
+              },
+              "start_datetime": {
+                "default": "",
+                "title": "Start Datetime",
+                "type": "string"
+              },
+              "end_datetime": {
+                "default": "",
+                "title": "End Datetime",
+                "type": "string"
+              }
+            },
+            "title": "Session",
+            "type": "object",
+            "x-sdl": "entity"
+          }
+        },
+        "properties": {
+          "id": {
+            "default": "session_list",
+            "title": "Id",
+            "type": "string"
+          },
+          "title": {
+            "default": "",
+            "title": "Title",
+            "type": "string"
+          },
+          "kind": {
+            "default": "",
+            "title": "Kind",
+            "type": "string"
+          },
+          "subtitle": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Subtitle"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Description"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Status"
+          },
+          "url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Url"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/$defs/Session"
+            },
+            "title": "Items",
+            "type": "array"
+          }
+        },
+        "title": "SessionList",
+        "type": "object",
+        "x-sdl": "entity"
+      },
+      "event": "blue-prism-connector.list_sessions",
+      "background": false,
+      "long_running": false,
+      "scopes": [],
+      "owner_chat_tool": "blue_prism"
+    },
+    {
+      "name": "get_session",
+      "description": "Read one session in full -- status, timing, resource, and any error info.",
+      "action_type": "read",
+      "chain_callable": true,
+      "effects": [],
+      "id_projection": "",
+      "params_schema": {
+        "properties": {
+          "connection_id": {
+            "default": "",
+            "description": "Which connected estate to use. Omit if only one is connected.",
+            "title": "Connection Id",
+            "type": "string"
+          },
+          "session_id": {
+            "description": "Session id, from list_sessions.",
+            "title": "Session Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "session_id"
+        ],
+        "title": "GetSessionParams",
+        "type": "object"
+      },
+      "return_schema": {
+        "properties": {
+          "id": {
+            "default": "",
+            "title": "Id",
+            "type": "string"
+          },
+          "title": {
+            "default": "",
+            "title": "Title",
+            "type": "string"
+          },
+          "kind": {
+            "default": "",
+            "title": "Kind",
+            "type": "string"
+          },
+          "subtitle": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Subtitle"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Description"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Status"
+          },
+          "url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Url"
+          },
+          "process_name": {
+            "default": "",
+            "title": "Process Name",
+            "type": "string"
+          },
+          "resource_name": {
+            "default": "",
+            "title": "Resource Name",
+            "type": "string"
+          },
+          "start_datetime": {
+            "default": "",
+            "title": "Start Datetime",
+            "type": "string"
+          },
+          "end_datetime": {
+            "default": "",
+            "title": "End Datetime",
+            "type": "string"
+          }
+        },
+        "title": "Session",
+        "type": "object",
+        "x-sdl": "entity"
+      },
+      "event": "blue-prism-connector.get_session",
+      "background": false,
+      "long_running": false,
+      "scopes": [],
+      "owner_chat_tool": "blue_prism"
+    },
+    {
+      "name": "start_session",
+      "description": "Start a session: run a process now, either on explicit runtime resources or by letting Blue Prism pick, with optional input parameters.",
+      "action_type": "write",
+      "chain_callable": true,
+      "effects": [
+        "blue_prism.session.started"
+      ],
+      "id_projection": "",
+      "params_schema": {
+        "properties": {
+          "connection_id": {
+            "default": "",
+            "description": "Which connected estate to use. Omit if only one is connected.",
+            "title": "Connection Id",
+            "type": "string"
+          },
+          "process_id": {
+            "description": "Process id to run, from list_processes.",
+            "title": "Process Id",
+            "type": "string"
+          },
+          "resource_ids": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Explicit runtime resource ids to run on. Omit to let Blue Prism pick.",
+            "title": "Resource Ids"
+          },
+          "inputs": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Optional input parameters for the process.",
+            "title": "Inputs"
+          }
+        },
+        "required": [
+          "process_id"
+        ],
+        "title": "StartSessionParams",
+        "type": "object"
+      },
+      "return_schema": {
+        "properties": {
+          "id": {
+            "default": "",
+            "title": "Id",
+            "type": "string"
+          },
+          "title": {
+            "default": "",
+            "title": "Title",
+            "type": "string"
+          },
+          "kind": {
+            "default": "",
+            "title": "Kind",
+            "type": "string"
+          },
+          "subtitle": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Subtitle"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Description"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Status"
+          },
+          "url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Url"
+          },
+          "ok": {
+            "default": false,
+            "title": "Ok",
+            "type": "boolean"
+          },
+          "detail": {
+            "default": "",
+            "title": "Detail",
+            "type": "string"
+          }
+        },
+        "title": "SessionActionResult",
+        "type": "object",
+        "x-sdl": "entity"
+      },
+      "event": "blue-prism-connector.start_session",
+      "background": false,
+      "long_running": false,
+      "scopes": [],
+      "owner_chat_tool": "blue_prism"
+    },
+    {
+      "name": "stop_session",
+      "description": "Stop a running session: 'stop' for graceful stop, 'terminate' to force-kill immediately.",
+      "action_type": "write",
+      "chain_callable": true,
+      "effects": [
+        "blue_prism.session.stopped"
+      ],
+      "id_projection": "",
+      "params_schema": {
+        "properties": {
+          "connection_id": {
+            "default": "",
+            "description": "Which connected estate to use. Omit if only one is connected.",
+            "title": "Connection Id",
+            "type": "string"
+          },
+          "session_id": {
+            "description": "Session id to stop, from list_sessions.",
+            "title": "Session Id",
+            "type": "string"
+          },
+          "action": {
+            "default": "stop",
+            "description": "'stop' for graceful stop, 'terminate' to force-kill immediately.",
+            "title": "Action",
+            "type": "string"
+          }
+        },
+        "required": [
+          "session_id"
+        ],
+        "title": "StopSessionParams",
+        "type": "object"
+      },
+      "return_schema": {
+        "properties": {
+          "id": {
+            "default": "",
+            "title": "Id",
+            "type": "string"
+          },
+          "title": {
+            "default": "",
+            "title": "Title",
+            "type": "string"
+          },
+          "kind": {
+            "default": "",
+            "title": "Kind",
+            "type": "string"
+          },
+          "subtitle": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Subtitle"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Description"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Status"
+          },
+          "url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Url"
+          },
+          "ok": {
+            "default": false,
+            "title": "Ok",
+            "type": "boolean"
+          },
+          "detail": {
+            "default": "",
+            "title": "Detail",
+            "type": "string"
+          }
+        },
+        "title": "SessionActionResult",
+        "type": "object",
+        "x-sdl": "entity"
+      },
+      "event": "blue-prism-connector.stop_session",
+      "background": false,
+      "long_running": false,
+      "scopes": [],
+      "owner_chat_tool": "blue_prism"
+    },
+    {
+      "name": "list_work_queues",
+      "description": "List Work Queues configured in the connected Blue Prism estate -- the queue/queue-item pattern used for high-volume unattended work.",
+      "action_type": "read",
+      "chain_callable": true,
+      "effects": [],
+      "id_projection": "",
+      "params_schema": {
+        "properties": {
+          "connection_id": {
+            "default": "",
+            "description": "Which connected estate to use. Omit if only one is connected.",
+            "title": "Connection Id",
+            "type": "string"
+          }
+        },
+        "title": "ListWorkQueuesParams",
+        "type": "object"
+      },
+      "return_schema": {
+        "$defs": {
+          "WorkQueue": {
+            "properties": {
+              "id": {
+                "default": "",
+                "title": "Id",
+                "type": "string"
+              },
+              "title": {
+                "default": "",
+                "title": "Title",
+                "type": "string"
+              },
+              "kind": {
+                "default": "",
+                "title": "Kind",
+                "type": "string"
+              },
+              "subtitle": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Subtitle"
+              },
+              "description": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Description"
+              },
+              "status": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Status"
+              },
+              "url": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Url"
+              },
+              "key_field": {
+                "default": "",
+                "title": "Key Field",
+                "type": "string"
+              },
+              "max_attempts": {
+                "default": 0,
+                "title": "Max Attempts",
+                "type": "integer"
+              },
+              "pending_count": {
+                "default": 0,
+                "title": "Pending Count",
+                "type": "integer"
+              }
+            },
+            "title": "WorkQueue",
+            "type": "object",
+            "x-sdl": "entity"
+          }
+        },
+        "properties": {
+          "id": {
+            "default": "work_queue_list",
+            "title": "Id",
+            "type": "string"
+          },
+          "title": {
+            "default": "",
+            "title": "Title",
+            "type": "string"
+          },
+          "kind": {
+            "default": "",
+            "title": "Kind",
+            "type": "string"
+          },
+          "subtitle": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Subtitle"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Description"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Status"
+          },
+          "url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Url"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/$defs/WorkQueue"
+            },
+            "title": "Items",
+            "type": "array"
+          }
+        },
+        "title": "WorkQueueList",
+        "type": "object",
+        "x-sdl": "entity"
+      },
+      "event": "blue-prism-connector.list_work_queues",
+      "background": false,
+      "long_running": false,
+      "scopes": [],
+      "owner_chat_tool": "blue_prism"
+    },
+    {
+      "name": "list_queue_items",
+      "description": "List items in a Work Queue, optionally filtered by status ('Pending', 'Locked', 'Completed', 'Exception').",
+      "action_type": "read",
+      "chain_callable": true,
+      "effects": [],
+      "id_projection": "",
+      "params_schema": {
+        "properties": {
+          "connection_id": {
+            "default": "",
+            "description": "Which connected estate to use. Omit if only one is connected.",
+            "title": "Connection Id",
+            "type": "string"
+          },
+          "queue_id": {
+            "description": "Work queue id, from list_work_queues.",
+            "title": "Queue Id",
+            "type": "string"
+          },
+          "status": {
+            "default": "",
+            "description": "Optional status filter, e.g. 'Pending', 'Locked', 'Completed', 'Exception'.",
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "queue_id"
+        ],
+        "title": "ListQueueItemsParams",
+        "type": "object"
+      },
+      "return_schema": {
+        "$defs": {
+          "QueueItem": {
+            "properties": {
+              "id": {
+                "default": "",
+                "title": "Id",
+                "type": "string"
+              },
+              "title": {
+                "default": "",
+                "title": "Title",
+                "type": "string"
+              },
+              "kind": {
+                "default": "",
+                "title": "Kind",
+                "type": "string"
+              },
+              "subtitle": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Subtitle"
+              },
+              "description": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Description"
+              },
+              "status": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Status"
+              },
+              "url": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Url"
+              },
+              "queue_id": {
+                "default": "",
+                "title": "Queue Id",
+                "type": "string"
+              },
+              "attempt": {
+                "default": 0,
+                "title": "Attempt",
+                "type": "integer"
+              },
+              "key_value": {
+                "default": "",
+                "title": "Key Value",
+                "type": "string"
+              }
+            },
+            "title": "QueueItem",
+            "type": "object",
+            "x-sdl": "entity"
+          }
+        },
+        "properties": {
+          "id": {
+            "default": "queue_item_list",
+            "title": "Id",
+            "type": "string"
+          },
+          "title": {
+            "default": "",
+            "title": "Title",
+            "type": "string"
+          },
+          "kind": {
+            "default": "",
+            "title": "Kind",
+            "type": "string"
+          },
+          "subtitle": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Subtitle"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Description"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Status"
+          },
+          "url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Url"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/$defs/QueueItem"
+            },
+            "title": "Items",
+            "type": "array"
+          }
+        },
+        "title": "QueueItemList",
+        "type": "object",
+        "x-sdl": "entity"
+      },
+      "event": "blue-prism-connector.list_queue_items",
+      "background": false,
+      "long_running": false,
+      "scopes": [],
+      "owner_chat_tool": "blue_prism"
+    },
+    {
+      "name": "add_queue_item",
+      "description": "Add a new work item to a Work Queue -- the payload a process will pick up and process.",
+      "action_type": "write",
+      "chain_callable": true,
+      "effects": [
+        "blue_prism.queue_item.created"
+      ],
+      "id_projection": "",
+      "params_schema": {
+        "properties": {
+          "connection_id": {
+            "default": "",
+            "description": "Which connected estate to use. Omit if only one is connected.",
+            "title": "Connection Id",
+            "type": "string"
+          },
+          "queue_id": {
+            "description": "Work queue id to add the item to, from list_work_queues.",
+            "title": "Queue Id",
+            "type": "string"
+          },
+          "key_value": {
+            "description": "The queue item's key value (its unique business identifier).",
+            "title": "Key Value",
+            "type": "string"
+          },
+          "data": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Optional item data fields.",
+            "title": "Data"
+          }
+        },
+        "required": [
+          "queue_id",
+          "key_value"
+        ],
+        "title": "AddQueueItemParams",
+        "type": "object"
+      },
+      "return_schema": {
+        "properties": {
+          "id": {
+            "default": "",
+            "title": "Id",
+            "type": "string"
+          },
+          "title": {
+            "default": "",
+            "title": "Title",
+            "type": "string"
+          },
+          "kind": {
+            "default": "",
+            "title": "Kind",
+            "type": "string"
+          },
+          "subtitle": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Subtitle"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Description"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Status"
+          },
+          "url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Url"
+          },
+          "queue_id": {
+            "default": "",
+            "title": "Queue Id",
+            "type": "string"
+          },
+          "attempt": {
+            "default": 0,
+            "title": "Attempt",
+            "type": "integer"
+          },
+          "key_value": {
+            "default": "",
+            "title": "Key Value",
+            "type": "string"
+          }
+        },
+        "title": "QueueItem",
+        "type": "object",
+        "x-sdl": "entity"
+      },
+      "event": "blue-prism-connector.add_queue_item",
+      "background": false,
+      "long_running": false,
+      "scopes": [],
+      "owner_chat_tool": "blue_prism"
+    },
+    {
+      "name": "set_queue_item_status",
+      "description": "Manually set a queue item's outcome to 'Completed' or 'Exception'.",
+      "action_type": "write",
+      "chain_callable": true,
+      "effects": [
+        "blue_prism.queue_item.status_changed"
+      ],
+      "id_projection": "",
+      "params_schema": {
+        "properties": {
+          "connection_id": {
+            "default": "",
+            "description": "Which connected estate to use. Omit if only one is connected.",
+            "title": "Connection Id",
+            "type": "string"
+          },
+          "item_id": {
+            "description": "Queue item id, from list_queue_items.",
+            "title": "Item Id",
+            "type": "string"
+          },
+          "status": {
+            "description": "New status: 'Completed' or 'Exception'.",
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "item_id",
+          "status"
+        ],
+        "title": "SetQueueItemStatusParams",
+        "type": "object"
+      },
+      "return_schema": {
+        "properties": {
+          "id": {
+            "default": "",
+            "title": "Id",
+            "type": "string"
+          },
+          "title": {
+            "default": "",
+            "title": "Title",
+            "type": "string"
+          },
+          "kind": {
+            "default": "",
+            "title": "Kind",
+            "type": "string"
+          },
+          "subtitle": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Subtitle"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Description"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Status"
+          },
+          "url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Url"
+          },
+          "queue_id": {
+            "default": "",
+            "title": "Queue Id",
+            "type": "string"
+          },
+          "attempt": {
+            "default": 0,
+            "title": "Attempt",
+            "type": "integer"
+          },
+          "key_value": {
+            "default": "",
+            "title": "Key Value",
+            "type": "string"
+          }
+        },
+        "title": "QueueItem",
+        "type": "object",
+        "x-sdl": "entity"
+      },
+      "event": "blue-prism-connector.set_queue_item_status",
+      "background": false,
+      "long_running": false,
+      "scopes": [],
+      "owner_chat_tool": "blue_prism"
+    },
+    {
+      "name": "list_resources",
+      "description": "List registered Runtime Resources in the connected Blue Prism estate -- their name, status, and resource pool.",
+      "action_type": "read",
+      "chain_callable": true,
+      "effects": [],
+      "id_projection": "",
+      "params_schema": {
+        "properties": {
+          "connection_id": {
+            "default": "",
+            "description": "Which connected estate to use. Omit if only one is connected.",
+            "title": "Connection Id",
+            "type": "string"
+          }
+        },
+        "title": "ListResourcesParams",
+        "type": "object"
+      },
+      "return_schema": {
+        "$defs": {
+          "Resource": {
+            "properties": {
+              "id": {
+                "default": "",
+                "title": "Id",
+                "type": "string"
+              },
+              "title": {
+                "default": "",
+                "title": "Title",
+                "type": "string"
+              },
+              "kind": {
+                "default": "",
+                "title": "Kind",
+                "type": "string"
+              },
+              "subtitle": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Subtitle"
+              },
+              "description": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Description"
+              },
+              "status": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Status"
+              },
+              "url": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Url"
+              },
+              "pool_name": {
+                "default": "",
+                "title": "Pool Name",
+                "type": "string"
+              }
+            },
+            "title": "Resource",
+            "type": "object",
+            "x-sdl": "entity"
+          }
+        },
+        "properties": {
+          "id": {
+            "default": "resource_list",
+            "title": "Id",
+            "type": "string"
+          },
+          "title": {
+            "default": "",
+            "title": "Title",
+            "type": "string"
+          },
+          "kind": {
+            "default": "",
+            "title": "Kind",
+            "type": "string"
+          },
+          "subtitle": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Subtitle"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Description"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Status"
+          },
+          "url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Url"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/$defs/Resource"
+            },
+            "title": "Items",
+            "type": "array"
+          }
+        },
+        "title": "ResourceList",
+        "type": "object",
+        "x-sdl": "entity"
+      },
+      "event": "blue-prism-connector.list_resources",
+      "background": false,
+      "long_running": false,
+      "scopes": [],
+      "owner_chat_tool": "blue_prism"
+    },
+    {
+      "name": "list_credentials",
+      "description": "List Credential Vault entries in the connected Blue Prism estate -- name and type only, never the secret value.",
+      "action_type": "read",
+      "chain_callable": true,
+      "effects": [],
+      "id_projection": "",
+      "params_schema": {
+        "properties": {
+          "connection_id": {
+            "default": "",
+            "description": "Which connected estate to use. Omit if only one is connected.",
+            "title": "Connection Id",
+            "type": "string"
+          }
+        },
+        "title": "ListCredentialsParams",
+        "type": "object"
+      },
+      "return_schema": {
+        "$defs": {
+          "Credential": {
+            "properties": {
+              "id": {
+                "default": "",
+                "title": "Id",
+                "type": "string"
+              },
+              "title": {
+                "default": "",
+                "title": "Title",
+                "type": "string"
+              },
+              "kind": {
+                "default": "",
+                "title": "Kind",
+                "type": "string"
+              },
+              "subtitle": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Subtitle"
+              },
+              "description": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Description"
+              },
+              "status": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Status"
+              },
+              "url": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Url"
+              },
+              "credential_type": {
+                "default": "",
+                "title": "Credential Type",
+                "type": "string"
+              },
+              "expiry_date": {
+                "default": "",
+                "title": "Expiry Date",
+                "type": "string"
+              }
+            },
+            "title": "Credential",
+            "type": "object",
+            "x-sdl": "entity"
+          }
+        },
+        "properties": {
+          "id": {
+            "default": "credential_list",
+            "title": "Id",
+            "type": "string"
+          },
+          "title": {
+            "default": "",
+            "title": "Title",
+            "type": "string"
+          },
+          "kind": {
+            "default": "",
+            "title": "Kind",
+            "type": "string"
+          },
+          "subtitle": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Subtitle"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Description"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Status"
+          },
+          "url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Url"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/$defs/Credential"
+            },
+            "title": "Items",
+            "type": "array"
+          }
+        },
+        "title": "CredentialList",
+        "type": "object",
+        "x-sdl": "entity"
+      },
+      "event": "blue-prism-connector.list_credentials",
+      "background": false,
+      "long_running": false,
+      "scopes": [],
+      "owner_chat_tool": "blue_prism"
+    },
+    {
+      "name": "bulk_stop_sessions",
+      "description": "Stop several running Sessions in one call, by explicit session ids. Continues past per-item failures and reports each outcome.",
+      "action_type": "write",
+      "chain_callable": true,
+      "effects": [
+        "blue_prism.session.stopped"
+      ],
+      "id_projection": "",
+      "params_schema": {
+        "properties": {
+          "connection_id": {
+            "default": "",
+            "description": "Which connected estate to use. Omit if only one is connected.",
+            "title": "Connection Id",
+            "type": "string"
+          },
+          "session_ids": {
+            "description": "Explicit session ids to act on.",
+            "items": {
+              "type": "string"
+            },
+            "title": "Session Ids",
+            "type": "array"
+          },
+          "action": {
+            "default": "stop",
+            "description": "'stop' for graceful stop, 'terminate' to force-kill immediately.",
+            "title": "Action",
+            "type": "string"
+          }
+        },
+        "required": [
+          "session_ids"
+        ],
+        "title": "BulkSessionIdsParams",
+        "type": "object"
+      },
+      "return_schema": {
+        "$defs": {
+          "BulkSessionResultItem": {
+            "properties": {
+              "id": {
+                "default": "",
+                "title": "Id",
+                "type": "string"
+              },
+              "title": {
+                "default": "",
+                "title": "Title",
+                "type": "string"
+              },
+              "kind": {
+                "default": "",
+                "title": "Kind",
+                "type": "string"
+              },
+              "subtitle": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Subtitle"
+              },
+              "description": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Description"
+              },
+              "status": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Status"
+              },
+              "url": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Url"
+              },
+              "ok": {
+                "default": false,
+                "title": "Ok",
+                "type": "boolean"
+              },
+              "detail": {
+                "default": "",
+                "title": "Detail",
+                "type": "string"
+              }
+            },
+            "title": "BulkSessionResultItem",
+            "type": "object",
+            "x-sdl": "entity"
+          }
+        },
+        "properties": {
+          "id": {
+            "default": "bulk_session_result",
+            "title": "Id",
+            "type": "string"
+          },
+          "title": {
+            "default": "",
+            "title": "Title",
+            "type": "string"
+          },
+          "kind": {
+            "default": "",
+            "title": "Kind",
+            "type": "string"
+          },
+          "subtitle": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Subtitle"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Description"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Status"
+          },
+          "url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Url"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/$defs/BulkSessionResultItem"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "succeeded": {
+            "default": 0,
+            "title": "Succeeded",
+            "type": "integer"
+          },
+          "failed": {
+            "default": 0,
+            "title": "Failed",
+            "type": "integer"
+          }
+        },
+        "title": "BulkSessionResult",
+        "type": "object",
+        "x-sdl": "entity"
+      },
+      "event": "blue-prism-connector.bulk_stop_sessions",
+      "background": false,
+      "long_running": false,
+      "scopes": [],
+      "owner_chat_tool": "blue_prism"
+    },
+    {
+      "name": "audit_estate",
+      "description": "Build one aggregated health report across every Runtime Resource in the connected Blue Prism estate: resource status, exception queue item counts, and running session counts.",
+      "action_type": "read",
+      "chain_callable": true,
+      "effects": [],
+      "id_projection": "",
+      "params_schema": {
+        "properties": {
+          "connection_id": {
+            "default": "",
+            "description": "Which connected estate to use. Omit if only one is connected.",
+            "title": "Connection Id",
+            "type": "string"
+          }
+        },
+        "title": "AuditEstateParams",
+        "type": "object"
+      },
+      "return_schema": {
+        "$defs": {
+          "EstateAuditRow": {
+            "properties": {
+              "id": {
+                "default": "",
+                "title": "Id",
+                "type": "string"
+              },
+              "title": {
+                "default": "",
+                "title": "Title",
+                "type": "string"
+              },
+              "kind": {
+                "default": "",
+                "title": "Kind",
+                "type": "string"
+              },
+              "subtitle": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Subtitle"
+              },
+              "description": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Description"
+              },
+              "status": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Status"
+              },
+              "url": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Url"
+              },
+              "resource_status": {
+                "default": "",
+                "title": "Resource Status",
+                "type": "string"
+              },
+              "exception_queue_items": {
+                "default": 0,
+                "title": "Exception Queue Items",
+                "type": "integer"
+              },
+              "running_sessions": {
+                "default": 0,
+                "title": "Running Sessions",
+                "type": "integer"
+              }
+            },
+            "title": "EstateAuditRow",
+            "type": "object",
+            "x-sdl": "entity"
+          }
+        },
+        "properties": {
+          "id": {
+            "default": "estate_audit_report",
+            "title": "Id",
+            "type": "string"
+          },
+          "title": {
+            "default": "",
+            "title": "Title",
+            "type": "string"
+          },
+          "kind": {
+            "default": "",
+            "title": "Kind",
+            "type": "string"
+          },
+          "subtitle": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Subtitle"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Description"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Status"
+          },
+          "url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Url"
+          },
+          "rows": {
+            "items": {
+              "$ref": "#/$defs/EstateAuditRow"
+            },
+            "title": "Rows",
+            "type": "array"
+          },
+          "total_resources": {
+            "default": 0,
+            "title": "Total Resources",
+            "type": "integer"
+          },
+          "offline_count": {
+            "default": 0,
+            "title": "Offline Count",
+            "type": "integer"
+          },
+          "total_exception_items": {
+            "default": 0,
+            "title": "Total Exception Items",
+            "type": "integer"
+          }
+        },
+        "title": "EstateAuditReport",
+        "type": "object",
+        "x-sdl": "entity"
+      },
+      "event": "blue-prism-connector.audit_estate",
+      "background": false,
+      "long_running": false,
+      "scopes": [],
+      "owner_chat_tool": "blue_prism"
+    }
+  ],
+  "signals": [],
+  "schedules": [],
+  "required_scopes": [],
+  "lifecycle": {
+    "health_check": {
+      "interval_sec": 60
+    }
+  },
+  "secrets": [
+    {
+      "name": "bp_connections",
+      "description": "Your connected Blue Prism estates -- stored as a JSON array, one entry per estate, each with its own Authentication Server Service Account (client_id, client_secret) and auth_server_url/api_base_url pair. Managed through connect_blue_prism / disconnect_blue_prism -- you should not need to edit this directly.",
+      "required": true,
+      "write_mode": "user",
+      "max_bytes": 4096,
+      "scope": "user"
+    }
+  ],
+  "panels": [
+    {
+      "panel_id": "secrets",
+      "slot": "right",
+      "title": "Secrets",
+      "tree": {},
+      "icon": "KeyRound",
+      "refresh": "manual",
+      "center_overlay": false
+    },
+    {
+      "panel_id": "bp_connect_help",
+      "slot": "center",
+      "title": "Connecting Blue Prism",
+      "tree": {},
+      "icon": "",
+      "refresh": "manual",
+      "center_overlay": true
+    },
+    {
+      "panel_id": "bp_center",
+      "slot": "center",
+      "title": "Blue Prism",
+      "tree": {},
+      "icon": "🔗",
+      "refresh": "manual",
+      "center_overlay": true
+    },
+    {
+      "panel_id": "bp_connect",
+      "slot": "left",
+      "title": "Blue Prism",
+      "tree": {},
+      "icon": "🔗",
+      "refresh": "manual",
+      "center_overlay": false,
+      "default_width": 320,
+      "min_width": 260,
+      "max_width": 420
+    },
+    {
+      "panel_id": "bp_settings",
+      "slot": "center",
+      "title": "Blue Prism -- App settings",
+      "tree": {},
+      "icon": "",
+      "refresh": "manual",
+      "center_overlay": false
+    }
+  ]
+}
