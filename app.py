@@ -70,6 +70,7 @@ ext = Extension(
         "Authentication Server v4.7+; classic Blue Prism Server without Hub "
         "has no REST surface this connector can reach."
     ),
+    icon="icon.svg",
 )
 
 chat = ChatExtension(

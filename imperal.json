@@ -5,7 +5,7 @@
   "version": "0.1.0",
   "name": "Blue Prism",
   "description": "Connect your own Blue Prism estate (via Blue Prism Hub + Authentication Server v4.7+) to see and manage your processes, sessions, work queues, and runtime resources from Imperal -- list processes and start/stop sessions against them, manage work queue items, browse connected runtime resources, and read credential metadata. Uses your own Authentication Server Service Account (OAuth2 client credentials) -- nothing is hosted or proxied by Imperal beyond the request itself. Requires Blue Prism Hub + Authentication Server v4.7+; classic Blue Prism Server without Hub has no REST surface this connector can reach.",
-  "icon": "",
+  "icon": "icon.svg",
   "actions_explicit": true,
   "system": false,
   "capabilities": [],
@@ -2737,6 +2737,7 @@
   "signals": [],
   "schedules": [],
   "required_scopes": [],
+  "icon_size_bytes": 324,
   "lifecycle": {
     "health_check": {
       "interval_sec": 60
