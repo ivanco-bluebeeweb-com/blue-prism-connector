@@ -71,6 +71,12 @@ ext = Extension(
         "has no REST surface this connector can reach."
     ),
     icon="icon.svg",
+    capabilities=[
+        "blue-prism:read",
+        "blue-prism:write",
+    ],
+    actions_explicit=True,
+    system=False,
 )
 
 chat = ChatExtension(
