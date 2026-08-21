@@ -1,0 +1,19 @@
+{
+  "connect_blue_prism": 0,
+  "list_connections": 0,
+  "disconnect_blue_prism": 0,
+  "list_processes": 8,
+  "get_process": 8,
+  "list_sessions": 8,
+  "get_session": 8,
+  "start_session": 20,
+  "stop_session": 16,
+  "list_work_queues": 8,
+  "list_queue_items": 8,
+  "add_queue_item": 16,
+  "set_queue_item_status": 16,
+  "list_resources": 8,
+  "list_credentials": 8,
+  "bulk_stop_sessions": 60,
+  "audit_estate": 40
+}
