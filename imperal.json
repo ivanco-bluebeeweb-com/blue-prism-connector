@@ -8,7 +8,10 @@
   "icon": "icon.svg",
   "actions_explicit": true,
   "system": false,
-  "capabilities": [],
+  "capabilities": [
+    "blue-prism:read",
+    "blue-prism:write"
+  ],
   "tools": [
     {
       "name": "connect_blue_prism",
@@ -2777,7 +2780,7 @@
       "slot": "center",
       "title": "Blue Prism",
       "tree": {},
-      "icon": "\ud83d\udd17",
+      "icon": "🔗",
       "refresh": "manual",
       "center_overlay": true
     },
@@ -2786,7 +2789,7 @@
       "slot": "left",
       "title": "Blue Prism",
       "tree": {},
-      "icon": "\ud83d\udd17",
+      "icon": "🔗",
       "refresh": "manual",
       "center_overlay": false,
       "default_width": 320,
