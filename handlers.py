@@ -63,7 +63,42 @@ def _to_provider_connection(c: dict) -> ProviderConnection:
     )
 
 
+_TOKEN_CACHE = "blue_prism_token_cache"
+_TOKEN_CACHE_TTL_SECONDS = 1500  # 25 min: Blue Prism's Authentication Server token response
+# does not return expires_in, so there is no provider-stated TTL to trust. This conservative
+# fixed window avoids re-requesting a token on every single tool call (AUTH_AND_CREDENTIALS_
+# STANDARD.md Part B3) while staying safely under typical client-credentials session lifetimes.
+
+
+async def _cached_token(ctx, conn_id: str) -> str:
+    import time as _time
+    page = await ctx.store.query(_TOKEN_CACHE, where={"connection_id": conn_id}, limit=1)
+    if not page.data:
+        return ""
+    doc = page.data[0].data
+    if int(doc.get("expires_at", 0)) <= int(_time.time()):
+        return ""
+    return doc.get("access_token", "")
+
+
+async def _store_token(ctx, conn_id: str, access_token: str) -> None:
+    import time as _time
+    page = await ctx.store.query(_TOKEN_CACHE, where={"connection_id": conn_id}, limit=1)
+    doc = {
+        "connection_id": conn_id,
+        "access_token": access_token,
+        "expires_at": int(_time.time()) + _TOKEN_CACHE_TTL_SECONDS,
+    }
+    if page.data:
+        await ctx.store.update(_TOKEN_CACHE, page.data[0].id, doc)
+    else:
+        await ctx.store.create(_TOKEN_CACHE, doc)
+
+
 async def _get_token_and_conn(ctx, connection_id: str):
+    """Reuse a cached access token when still fresh (see
+    AUTH_AND_CREDENTIALS_STANDARD.md Part B3) instead of re-authenticating
+    against the Authentication Server on every single tool call."""
     connections = await _load_connections(ctx)
     if not connections:
         return ActionResult.error("No Blue Prism estate connected yet. Use connect_blue_prism first.", code="BP_NOT_CONNECTED")
@@ -74,10 +109,16 @@ async def _get_token_and_conn(ctx, connection_id: str):
             return ActionResult.error(f"No connection found with id {connection_id}.", code="BP_CONNECTION_NOT_FOUND")
     else:
         conn = connections[0]
-    tok = await bc.get_access_token(ctx, conn["auth_server_url"], conn["client_id"], conn["client_secret"])
-    if not tok.get("ok"):
-        return ActionResult.error(tok.get("error", "Failed to authenticate with Blue Prism."), code=tok.get("error_code", "BP_ERROR"))
-    return conn, tok["access_token"]
+    conn_id = conn.get("id", "")
+    access_token = await _cached_token(ctx, conn_id) if conn_id else ""
+    if not access_token:
+        tok = await bc.get_access_token(ctx, conn["auth_server_url"], conn["client_id"], conn["client_secret"])
+        if not tok.get("ok"):
+            return ActionResult.error(tok.get("error", "Failed to authenticate with Blue Prism."), code=tok.get("error_code", "BP_ERROR"))
+        access_token = tok["access_token"]
+        if conn_id:
+            await _store_token(ctx, conn_id, access_token)
+    return conn, access_token
 
 
 @chat.function(
