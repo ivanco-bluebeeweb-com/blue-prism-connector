@@ -172,10 +172,49 @@ async def bp_connect_help(ctx, **kwargs) -> ui.UINode:
 
 @ext.panel("bp_center", slot="center", title="Blue Prism", icon="🔗", center_overlay=True)
 async def bp_center_panel(ctx, **kwargs) -> ui.UINode:
-    return ui.Stack(direction="v", align="center", justify="center", children=[
-        ui.Text("Nothing to show here -- this app is managed entirely from the sidebar.",
-                variant="caption"),
-    ])
+    """Post-connect main screen: an estate audit (resources/exceptions)
+    plus recent sessions -- gives a real operational picture instead of
+    the previous empty placeholder."""
+    connections = await h._load_connections(ctx)
+    if not connections:
+        return ui.Empty(message="Connect a Blue Prism estate from the sidebar to see it here.", icon="🔗")
+
+    from schemas import AuditEstateParams, ListSessionsParams
+    conn_id = connections[0].get("id", "")
+    body: list[ui.UINode] = [ui.Text("Estate audit", variant="subtitle")]
+    audit_result = await h.audit_estate(ctx, AuditEstateParams(connection_id=conn_id))
+    if audit_result.success and audit_result.data:
+        r = audit_result.data
+        body.append(ui.Stats(children=[
+            ui.Stat(label="Resources", value=str(r.total_resources)),
+            ui.Stat(label="Offline", value=str(r.offline_count)),
+            ui.Stat(label="Exception items", value=str(r.total_exception_items)),
+        ]))
+        for row in r.rows[:15]:
+            color = "red" if row.exception_queue_items > 0 else ("yellow" if row.running_sessions > 0 else "green")
+            body.append(ui.Stack(direction="h", gap=2, align="center", children=[
+                ui.Badge(label=row.resource_status or "UNKNOWN", color=color),
+                ui.Text(row.title, variant="body"),
+                ui.Text(f"running: {row.running_sessions} · exceptions: {row.exception_queue_items}", variant="caption"),
+            ]))
+    else:
+        body.append(ui.Text("Could not load the estate audit.", variant="caption"))
+
+    body.append(ui.Divider())
+    body.append(ui.Text("Recent sessions", variant="subtitle"))
+    sessions_result = await h.list_sessions(ctx, ListSessionsParams(connection_id=conn_id))
+    if sessions_result.success and sessions_result.data and sessions_result.data.items:
+        for s in sessions_result.data.items[:15]:
+            color = {"Failed": "red", "Running": "yellow", "Completed": "green"}.get(s.status or "", "gray")
+            body.append(ui.Stack(direction="h", gap=2, align="center", children=[
+                ui.Badge(label=s.status or "UNKNOWN", color=color),
+                ui.Text(s.title or s.process_name, variant="body"),
+                ui.Text(s.resource_name, variant="caption"),
+            ]))
+    else:
+        body.append(ui.Text("No recent sessions.", variant="caption"))
+
+    return ui.Stack(direction="v", gap=3, align="stretch", children=body)
 
 
 @ext.panel("bp_connect", slot="left", title="Blue Prism", icon="🔗",
@@ -219,6 +258,9 @@ async def bp_connect_panel(ctx, **kwargs) -> ui.UINode:
         ui.Divider(),
         ui.Text(f"Processes -- {first.get('label') or first.get('api_base_url', '')}", variant="subtitle"),
         _processes_section(processes),
+        ui.Divider(),
+        ui.Button("View estate dashboard", variant="primary", size="sm", full_width=True,
+                  icon="LayoutDashboard", on_click=ui.Call("__panel__bp_center")),
         ui.Divider(),
         _settings_button(),
     ])
