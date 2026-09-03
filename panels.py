@@ -47,8 +47,7 @@ def _settings_button() -> ui.UINode:
     """The one required secondary entry point into the settings screen --
     always the last element at the bottom of the sidebar."""
     return ui.Button(
-        "App settings", variant="secondary", size="sm", full_width=True,
-        icon="settings", on_click=ui.Call("__panel__bp_settings"),
+        "App settings", variant="secondary", size="sm", icon="settings", on_click=ui.Call("__panel__bp_settings"),
     )
 
 
@@ -259,8 +258,7 @@ async def bp_connect_panel(ctx, **kwargs) -> ui.UINode:
         ui.Text(f"Processes -- {first.get('label') or first.get('api_base_url', '')}", variant="subtitle"),
         _processes_section(processes),
         ui.Divider(),
-        ui.Button("View estate dashboard", variant="primary", size="sm", full_width=True,
-                  icon="LayoutDashboard", on_click=ui.Call("__panel__bp_center")),
+        ui.Button("View estate dashboard", variant="primary", size="sm", icon="LayoutDashboard", on_click=ui.Call("__panel__bp_center")),
         ui.Divider(),
         _settings_button(),
     ])
